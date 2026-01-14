@@ -1,14 +1,14 @@
 use crate::matrix::Matrix;
 
 #[derive(Debug)]
-struct NeuralNetwork {
+pub struct NeuralNetwork {
     weights: Vec<Matrix>,
     neurons: Vec<Matrix>,
     biases: Vec<Matrix>,
 }
 
 impl NeuralNetwork {
-    fn new(dimensions: &[usize]) -> NeuralNetwork {
+    pub fn new(dimensions: &[usize]) -> NeuralNetwork {
         let mut network = NeuralNetwork {
             neurons: Vec::new(),
             weights: Vec::new(),
@@ -40,7 +40,7 @@ impl NeuralNetwork {
         network
     }
 
-    fn forward_propagate(&mut self, inputs: &Matrix) -> Matrix {
+    pub fn forward_propagate(&mut self, inputs: &Matrix) -> Matrix {
         assert_eq!(inputs.get_rows(), self.neurons[0].get_rows());
         assert_eq!(inputs.get_cols(), self.neurons[0].get_cols());
 
@@ -55,6 +55,11 @@ impl NeuralNetwork {
         }
 
         self.neurons[self.neurons.len() - 1].clone()
+    }
+
+    //returns the loss of the function
+    pub fn backward_propagate(&mut self, data_outputs: &Matrix) -> f32 {
+        0.0
     }
 }
 
