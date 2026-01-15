@@ -21,18 +21,16 @@ impl NeuralNetwork {
         }
 
         //initiate biases
-        //TODO: RANDOM RATHER THAN 0's
         for i in 1..dimensions.len() {
-            network.biases.push(Matrix::populate_random(dimensions[i], 1));
+            network.biases.push(Matrix::populate_random(dimensions[i], 1, -0.01, 0.01));
         }
 
         //initiate weights
-        //TODO: RANDOM RATHER THAN 0's
         for i in 0..dimensions.len() - 1{
             let next_dim_size = dimensions[i + 1];
             let current_dim_size = dimensions[i];
 
-            let weights = Matrix::populate_random(next_dim_size, current_dim_size);
+            let weights = Matrix::populate_random(next_dim_size, current_dim_size, 0.0, 0.4);
 
             network.weights.push(weights);
         }
@@ -58,8 +56,70 @@ impl NeuralNetwork {
     }
 
     //returns the loss of the function
-    pub fn backward_propagate(&mut self, data_outputs: &Matrix) -> f32 {
-        0.0
+    //standard MSE Loss SUM((x1 - x2)^2)
+    pub fn calculate_loss(&self, data_outputs: &Matrix) -> f32 {
+        let output_layer = &self.neurons[self.neurons.len() - 1];
+
+        let mut loss = 0.0;
+
+        for y in 0..output_layer.get_rows() {
+            loss += (output_layer.get(y, 0) - data_outputs.get(y, 0)).powi(2);
+        }
+
+        loss
+    }
+
+    pub fn loss_derivative(&self, data_outputs: &Matrix) -> Matrix {
+        let output_layer = &self.neurons[self.neurons.len() - 1];
+
+        let mut derivatives = Matrix::zeros(output_layer.get_rows(), 1);
+
+        //TODO optimise to be a matrix subtraction followed by a scalar multiply of 2
+        for y in 0..output_layer.get_rows() {
+            let derivative = 2.0 * (output_layer.get(y, 0) - data_outputs.get(y, 0));
+            derivatives.set(y, 0, derivative);
+        }
+
+        derivatives
+    }
+   
+    pub fn backward_propagate(&mut self, data_outputs: &Matrix, alpha: f32) {
+        let loss_derivatives = self.loss_derivative(data_outputs);
+
+        let neuron_count = self.neurons.len();
+
+        let mut chained_derivatives = self.neurons.clone();
+        chained_derivatives[neuron_count - 1] = loss_derivatives;
+
+        let final_index = self.neurons.len() - 1;
+
+        for i in 0..neuron_count - 1 {
+            let neuron_layer = &self.neurons[final_index - i];
+            let relu_derivative = neuron_layer.relu_derivative();
+            let chained_derivative = &chained_derivatives[final_index - i];
+            let chained_derivative = chained_derivative.pointwise_multiply(&relu_derivative);
+
+            let previous_neuron_layer = &self.neurons[final_index - i - 1];
+            let previous_weight_layer = &self.weights[final_index - i - 1];
+            let previous_bias_layer = &self.biases[final_index - i - 1];
+
+            //find derivatives of weights given by d/n1 x (n0)^T
+            let derivative_weights = chained_derivative.multiply(&previous_neuron_layer.transpose());
+
+            //find derivatives of biases given by d/n1 x 1
+            //println!("{:?}", chained_derivatives);
+            //println!("{:?}", previous_bias_layer);
+            //println!("{:?}", self.biases);
+            let derivative_biases = &chained_derivative;
+
+            //find derivatives of neurons in previous layer for chaining given by ((d/n1)^T x w)^T
+            let transposed_chained_derivative = chained_derivative.transpose();
+            let derivative_neurons = transposed_chained_derivative.multiply(previous_weight_layer).transpose();
+
+            self.weights[final_index - i - 1] = previous_weight_layer.subtract(&derivative_weights.scalar_multiply(alpha));
+            self.biases[final_index - i - 1] = previous_bias_layer.subtract(&derivative_biases.scalar_multiply(alpha));
+            chained_derivatives[final_index - i - 1] = derivative_neurons;
+        }
     }
 }
 

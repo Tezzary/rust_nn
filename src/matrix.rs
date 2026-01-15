@@ -27,7 +27,7 @@ impl Matrix {
     }
 
     //fill array random floats between [-1, 1]
-    pub fn populate_random(rows: usize, cols: usize) -> Matrix {
+    pub fn populate_random(rows: usize, cols: usize, min: f32, max: f32) -> Matrix {
         let mut matrix = Matrix {
             data: Vec::new(),
             rows: rows,
@@ -36,9 +36,11 @@ impl Matrix {
 
         let mut rng = rand::rng();
 
+        let range = max - min;
+
         for _y in 0..rows {
             for _x in 0..cols {
-                matrix.data.push(rng.random::<f32>() * 2.0 - 1.0);
+                matrix.data.push(rng.random::<f32>() * range + min);
             }
         }
 
@@ -107,12 +109,69 @@ impl Matrix {
 
         result
     }
+
+    pub fn pointwise_multiply(&self, rhs: &Matrix) -> Matrix {
+        assert_eq!(self.rows, rhs.rows);
+        assert_eq!(self.cols, rhs.cols);
+
+        let mut result = Matrix::zeros(self.rows, self.cols);
+
+        for y in 0..result.get_rows() {
+            for x in 0..result.get_cols() {
+                let value = self.get(y, x) * rhs.get(y, x);
+                result.set(y, x, value);
+            }
+        }
+
+        result
+    }
+
+    pub fn scalar_multiply(&self, scale: f32) -> Matrix {
+        let mut result = Matrix::zeros(self.rows, self.cols);
+         for y in 0..result.get_rows() {
+            for x in 0..result.get_cols() {
+                let value = self.get(y, x);
+                result.set(y, x, value * scale);
+            }
+        }
+        result
+    }
+
     pub fn relu(&mut self) {
         for item in &mut self.data {
             if *item < 0.0 {
                 *item = 0.0;
             }
         }
+    }
+
+    pub fn relu_derivative(&self) -> Matrix {
+        let mut derivatives = Matrix::zeros(self.get_rows(), self.get_cols());
+        
+        for y in 0..self.get_rows() {
+            for x in 0..self.get_cols() {
+                let mut derivative = 0.0;
+                if self.get(y, x) > 0.0 {
+                    derivative = 1.0;
+                }
+                derivatives.set(y, x, derivative);
+            }
+        }
+
+        derivatives
+    }
+
+    pub fn transpose(&self) -> Matrix {
+        let mut t = Matrix::zeros(self.get_cols(), self.get_rows());
+
+        for y in 0..self.get_rows() {
+            for x in 0..self.get_cols() {
+                let value = self.get(y, x);
+                t.set(x, y, value);
+            }
+        }
+
+        t
     }
     
 }
@@ -137,11 +196,11 @@ mod tests {
 
     #[test]
     fn test_populate_random() {
-        let matrix = Matrix::populate_random(2, 3);
+        let matrix = Matrix::populate_random(2, 3, -1.0, 1.0);
 
         assert_eq!(matrix.get_rows(), 2);
         assert_eq!(matrix.get_cols(), 3);
-        
+
         for y in 0..matrix.get_rows() {
             for x in 0..matrix.get_cols() {
                 assert!(-1.0 <= matrix.get(y, x) && 1.0 >= matrix.get(y, x));
