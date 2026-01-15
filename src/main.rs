@@ -31,13 +31,13 @@ fn generate_training_data() -> Vec<TrainingData> {
     vec![data_1, data_2, data_3]
 }
 
-const GENERATIONS: usize = 100;
+const GENERATIONS: usize = 1000;
 const ALPHA: f32 = 0.02;
 
 fn main() {
     let training_data = generate_training_data();
 
-    let dimensions = [3, 5, 5, 2];
+    let dimensions = [3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2];
     let mut network = NeuralNetwork::new(&dimensions);
 
     for generation in 0..GENERATIONS {
@@ -56,8 +56,8 @@ fn main() {
         }
 
         
-        println!("Generation {} Complete!", generation + 1);
-        println!("Loss: {}", sum_loss / training_data.len() as f32);
+        //println!("Generation {} Complete!", generation + 1);
+        //println!("Loss: {}", sum_loss / training_data.len() as f32);
     }
 
 
