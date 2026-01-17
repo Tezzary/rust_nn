@@ -1,52 +1,46 @@
 mod network;
 mod matrix;
+mod training_data;
 
 use matrix::Matrix;
 use network::NeuralNetwork;
 
-struct TrainingData {
-    input: Matrix,
-    output: Matrix
-}
-fn generate_training_data() -> Vec<TrainingData> {
 
-    let mut input_1 = Matrix::zeros(3, 1);
-    input_1.set(0, 0, 1.0);
-    let mut output_1 = Matrix::zeros(2, 1);
-    output_1.set(0, 0, 1.0);
-    let data_1 = TrainingData {input: input_1, output: output_1};
-
-    let mut input_2 = Matrix::zeros(3, 1);
-    input_2.set(1, 0, 1.0);
-    let mut output_2 = Matrix::zeros(2, 1);
-    output_2.set(0, 0, 1.0);
-    let data_2 = TrainingData {input: input_2, output: output_2};
-
-    let mut input_3 = Matrix::zeros(3, 1);
-    input_3.set(2, 0, 1.0);
-    let mut output_3 = Matrix::zeros(2, 1);
-    output_3.set(1, 0, 1.0);
-    let data_3 = TrainingData {input: input_3, output: output_3};
-
-    vec![data_1, data_2, data_3]
-}
-
-const GENERATIONS: usize = 1000;
+const GENERATIONS: usize = 10;
 const ALPHA: f32 = 0.001;
 
 fn main() {
-    let training_data = generate_training_data();
+    let training_data = training_data::read_dataset("data/mnist_train.csv");
 
-    let dimensions = [3, 2];
+    println!("loaded data");
+    let dimensions = [784, 40, 20, 10];
     let mut network = NeuralNetwork::new(&dimensions);
 
     for generation in 0..GENERATIONS {
         let mut sum_loss = 0.0;
+        let mut successes = 0;
         for data in &training_data {
             let data_input = &data.input;
             let data_output = &data.output;
 
             let output = network.forward_propagate(data_input);
+            
+            let mut max = -1.0;
+            let mut max_y = 0;
+            let mut actual_y = 0;
+            for y in 0..output.get_rows() {
+                let value = output.get(y, 0);
+                if value > max {
+                    max = value;
+                    max_y = y;
+                }
+                if data_output.get(y, 0) == 1.0 {
+                    actual_y = y;
+                }
+            }
+            if actual_y == max_y {
+                successes += 1;
+            }
 
             let loss = network.calculate_loss(data_output);
             //println!("{:?}", output);
@@ -58,6 +52,7 @@ fn main() {
         
         println!("Generation {} Complete!", generation + 1);
         println!("Loss: {}", sum_loss / training_data.len() as f32);
+        println!("Correctly Guessed: {:.2}%", (successes * 100) as f32 / training_data.len() as f32);
     }
 
 

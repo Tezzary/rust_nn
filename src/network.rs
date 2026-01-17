@@ -30,7 +30,7 @@ impl NeuralNetwork {
             let next_dim_size = dimensions[i + 1];
             let current_dim_size = dimensions[i];
 
-            let weights = Matrix::populate_random(next_dim_size, current_dim_size, 0.0, 0.4);
+            let weights = Matrix::populate_random(next_dim_size, current_dim_size, 0.0, 0.05);
 
             network.weights.push(weights);
         }
