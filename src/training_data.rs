@@ -5,28 +5,6 @@ pub struct TrainingData {
     pub input: Matrix,
     pub output: Matrix
 }
-pub fn generate_training_data() -> Vec<TrainingData> {
-
-    let mut input_1 = Matrix::zeros(3, 1);
-    input_1.set(0, 0, 1.0);
-    let mut output_1 = Matrix::zeros(2, 1);
-    output_1.set(0, 0, 1.0);
-    let data_1 = TrainingData {input: input_1, output: output_1};
-
-    let mut input_2 = Matrix::zeros(3, 1);
-    input_2.set(1, 0, 1.0);
-    let mut output_2 = Matrix::zeros(2, 1);
-    output_2.set(0, 0, 1.0);
-    let data_2 = TrainingData {input: input_2, output: output_2};
-
-    let mut input_3 = Matrix::zeros(3, 1);
-    input_3.set(2, 0, 1.0);
-    let mut output_3 = Matrix::zeros(2, 1);
-    output_3.set(1, 0, 1.0);
-    let data_3 = TrainingData {input: input_3, output: output_3};
-
-    vec![data_1, data_2, data_3]
-}
 
 pub fn read_dataset(filename: &str) -> Vec<TrainingData> {
     let mut data = Vec::new();

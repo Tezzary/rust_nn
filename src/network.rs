@@ -107,9 +107,6 @@ impl NeuralNetwork {
             let derivative_weights = chained_derivative.multiply(&previous_neuron_layer.transpose());
 
             //find derivatives of biases given by d/n1 x 1
-            //println!("{:?}", chained_derivatives);
-            //println!("{:?}", previous_bias_layer);
-            //println!("{:?}", self.biases);
             let derivative_biases = &chained_derivative;
 
             //find derivatives of neurons in previous layer for chaining given by ((d/n1)^T x w)^T
@@ -140,10 +137,5 @@ mod test {
         inputs.set(1, 0, 2.0);
 
         let output = network.forward_propagate(&inputs);
-
-        //println!("{:?}", network.neurons);
-        //println!("{:?}", network.biases);
-        //println!("{:?}", network.weights);
-        //println!("{:?}", output);
     }
 }
