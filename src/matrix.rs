@@ -173,7 +173,52 @@ impl Matrix {
 
         t
     }
+
+    pub fn resize(&self, rows: usize, cols: usize) -> Matrix {
+        assert!(self.get_rows() * self.get_cols() == rows * cols);
+        let mut result = Matrix::zeros(rows, cols);
+        result.data = self.data.clone();
+        result
+    }
+
+    pub fn to_string(&self) -> String {
+        let mut matrix_representation = "".to_string();
+        for y in 0..self.get_rows() {
+            matrix_representation.push('[');
+            for x in 0..self.get_cols() {
+                let value = self.get(y, x);
+                if x == self.get_cols() - 1 {
+                    matrix_representation.push_str(&format!("{:.2}", value));
+                }
+                else {
+                    matrix_representation.push_str(&format!("{:.2}, ", value));
+                }
+
+
+            }
+            matrix_representation.push(']');
+            matrix_representation.push('\n');
+        }
+        matrix_representation
+    }
     
+    pub fn to_string_image(&self) -> String {
+        let mut matrix_representation = "".to_string();
+        for y in 0..self.get_rows() {
+            for x in 0..self.get_cols() {
+                let value = self.get(y, x);
+                if value > 0.5 {
+                    matrix_representation.push_str("X-");
+                }
+                else {
+                    matrix_representation.push_str("--");
+                }
+
+            }
+            matrix_representation.push('\n');
+        }
+        matrix_representation
+    }
 }
 
 #[cfg(test)]

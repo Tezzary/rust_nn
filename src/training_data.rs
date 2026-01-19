@@ -42,3 +42,20 @@ pub fn read_dataset(filename: &str) -> Vec<TrainingData> {
 
     data
 }
+
+impl TrainingData {
+    pub fn to_string(&self) -> String {
+        let resized_input = self.input.resize(28, 28);
+        let mut data_print_out = resized_input.to_string_image();
+
+        let resized_output = self.output.resize(1, 10);
+        data_print_out.push_str(&("Correct Output: ".to_string() + &resized_output.to_string()));
+        for x in 0..resized_output.get_cols() {
+            let value = resized_output.get(0, x);
+            if value != 0.0 {
+                data_print_out.push_str(&format!("Correct Label: {}\n", x));
+            }
+        }
+        data_print_out
+    }
+}
