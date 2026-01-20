@@ -4,8 +4,9 @@ mod training_data;
 
 use matrix::Matrix;
 use network::NeuralNetwork;
-
-use std::fs;
+ 
+use std::{alloc::System, fs, time::Duration};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 const GENERATIONS: usize = 20;
 const ALPHA: f32 = 0.0005;
@@ -32,6 +33,24 @@ fn is_correct(real_output: &Matrix, network_output: &Matrix) -> bool {
 }
 
 fn main() {
+    //uncomment for multiply speed test
+    /*
+    let mut times = 0;
+    for _ in 0..5 {
+        let a = Matrix::populate_random(10000, 2, -1.0, 1.0);
+        let b = Matrix::populate_random(2, 10000, -1.0, 1.0);
+        let time = SystemTime::now();
+        let _c = a.multiply(&b);
+        let time_after = SystemTime::now();
+        times += time_after.duration_since(time).unwrap().as_micros();
+    }
+
+    println!("Time: {:.2}ms", times as f32 / 1000.0 / 5.0);
+
+    return;
+    */
+
+
 
     if fs::exists("results").expect("failed to check results exists") {
         fs::remove_dir_all("results").expect("Failed to clear results directory");
