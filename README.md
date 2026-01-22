@@ -12,6 +12,7 @@ The current implementation has managed to achieve a 97.54% accuracy on the MNIST
 3. Forward Propagation
 4. MSE Loss
 5. Backpropagation to implement gradient descent and reduce network loss
+6. Visualisations of results on test data, with confidence on decisions
 
 ## Running Training and Testing
 1. go to https://github.com/phoebetronic/mnist and download mnist_test.csv and mnist_test.csv files (not folders), and place them inside /data folder in repo main directory
@@ -140,3 +141,5 @@ Correct Label: 8
 Network Output: [0.00, 0.00, 0.00, 0.00, 0.76, 0.04, 0.00, 0.00, 0.37, 0.00]
 Network Label: 4
 ```
+
+Overall though it is important to remember that these were handpicked scenarios to show the networks limits and in the end in the 10k images in the test set it correctly guessed 9754 digits and the above was one of only 246 incorrect identifications so it is very accurate overall but does have limits with its current implementation.
